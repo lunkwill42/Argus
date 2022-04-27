@@ -2,7 +2,6 @@ import json
 
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework.decorators import action
-from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from drf_rw_serializers import viewsets as rw_viewsets
@@ -48,10 +47,7 @@ class NotificationProfileViewSetV1(rw_viewsets.ModelViewSet):
     )
     @action(methods=["get"], detail=True)
     def incidents(self, request, pk, *args, **kwargs):
-        try:
-            notification_profile = request.user.notification_profiles.get(pk=pk)
-        except NotificationProfile.DoesNotExist:
-            raise ValidationError(f"Notification profile with pk={pk} does not exist.")
+        notification_profile = request.user.notification_profiles.get(pk=pk)
         serializer = IncidentSerializer(notification_profile.filtered_incidents, many=True)
         return Response(serializer.data)
 
