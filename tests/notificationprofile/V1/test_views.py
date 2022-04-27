@@ -58,31 +58,4 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
         response.render()
         self.assertEqual(response.content, self.incident1_json)
 
-    def test_notification_profile_can_properly_change_timeslot(self):
-        profile1_pk = self.notification_profile1.pk
-        profile1_path = reverse("v1:notification-profile:notificationprofile-detail", args=[profile1_pk])
-
-        self.assertEqual(self.user1.notification_profiles.get(pk=profile1_pk).timeslot, self.timeslot1)
-        self.assertEqual(self.user1_rest_client.get(profile1_path).status_code, status.HTTP_200_OK)
-        response = self.user1_rest_client.put(
-            profile1_path,
-            {
-                "timeslot": self.timeslot2.pk,
-                "filters": [f.pk for f in self.notification_profile1.filters.all()],
-                "media": self.media_v1,
-                "phone_number": self.phone_number,
-                "active": self.notification_profile1.active,
-            },
-        )
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        new_profile1_pk = response.data["pk"]
-
-        self.assertEqual(self.user1_rest_client.get(profile1_path).status_code, status.HTTP_404_NOT_FOUND)
-        with self.assertRaises(NotificationProfile.DoesNotExist):
-            self.notification_profile1.refresh_from_db()
-        self.assertTrue(self.user1.notification_profiles.filter(pk=new_profile1_pk).exists())
-        self.assertEqual(self.user1.notification_profiles.get(pk=new_profile1_pk).timeslot, self.timeslot2)
-        new_profile1_path = reverse("v1:notification-profile:notificationprofile-detail", args=[new_profile1_pk])
-        self.assertEqual(self.user1_rest_client.get(new_profile1_path).status_code, status.HTTP_200_OK)
-
     # TODO: test more endpoints
