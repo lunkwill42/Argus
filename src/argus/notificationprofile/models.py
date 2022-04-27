@@ -281,19 +281,28 @@ class DestinationConfig(models.Model):
 
 
 class NotificationProfile(models.Model):
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["user", "name"], name="unique_name_per_user"),
+        ]
+
     class Media(models.TextChoices):
         EMAIL = "EM", "Email"
         SMS = "SM", "SMS"
 
+    id = models.AutoField(primary_key=True)
     user = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name="notification_profiles")
-    timeslot = models.OneToOneField(
+    timeslot = models.ForeignKey(
         to=Timeslot,
         on_delete=models.CASCADE,
-        primary_key=True,
-        related_name="notification_profile",
+        related_name="notification_profiles",
     )
     filters = models.ManyToManyField(to=Filter, related_name="notification_profiles")
-
+    name = models.CharField(
+        max_length=40,
+        blank=True,
+        null=True,
+    )
     media = MultiSelectField(choices=Media.choices, min_choices=1, default=[Media.EMAIL])
     media_v1 = MultiSelectField(choices=Media.choices, min_choices=1, default=[Media.EMAIL])
     active = models.BooleanField(default=True)
@@ -305,6 +314,8 @@ class NotificationProfile(models.Model):
     )
 
     def __str__(self):
+        if self.name:
+            return f"{self.name}"
         return f"{self.timeslot}: {', '.join(str(f) for f in self.filters.all())}"
 
     @property
