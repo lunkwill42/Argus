@@ -37,9 +37,9 @@ class ViewTests(APITestCase, IncidentAPITestCaseHelper):
         self.notification_profile1.destinations.set(self.user1.destinations.all())
         self.media = []
         self.phone_number = None
-        if self.notification_profile1.destinations.filter(media__slug="email").exists():
+        if self.notification_profile1.destinations.filter(media_id="email").exists():
             self.media.append("EM")
-        if self.notification_profile1.destinations.filter(media__slug="sms").exists():
+        if self.notification_profile1.destinations.filter(media_id="sms").exists():
             self.media.append("SM")
             self.phone_number = (
                 self.notification_profile1.destinations.filter(media_id="sms")
