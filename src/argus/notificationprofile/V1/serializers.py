@@ -54,9 +54,9 @@ class ResponseNotificationProfileSerializerV1(serializers.ModelSerializer):
 
     def get_media(self, profile: NotificationProfile) -> List[str]:
         media = []
-        if profile.destinations.filter(media__slug="email").exists():
+        if profile.destinations.filter(media_id="email").exists():
             media.append("EM")
-        if profile.destinations.filter(media__slug="sms").exists():
+        if profile.destinations.filter(media_id="sms").exists():
             media.append("SM")
         return media
 
