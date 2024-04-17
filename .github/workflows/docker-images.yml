@@ -2,6 +2,7 @@
 name: Create and publish Argus API Docker image
 
 on:
+  workflow_dispatch:
   release:
     types:
       - published
